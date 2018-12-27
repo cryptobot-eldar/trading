@@ -1,8 +1,8 @@
 image: docker:stable
 
 services:
-  - docker:dind
-#  - name: docker:dind
+#  - docker:dind
+  - name: docker:dind
 #    command: ["--insecure-registry=registry.local:5000"]
 
 
@@ -16,7 +16,7 @@ before_script:
 #  - docker run -v /etc/hosts:/hosts -i alpine:latest sh -c "echo 192.168.1.128 registry.local > /hosts"
 
 #  - echo '192.168.1.127 registry.local' >> /etc/hosts
-  - docker login -u egaraev -p Kax0vka44609 hub.docker.com
+#  - docker login -u egaraev -p Kax0vka44609 hub.docker.com
 
 build:
   stage: build
