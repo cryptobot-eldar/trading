@@ -1,4 +1,4 @@
 FROM egaraev/centos-python-eldar:latest
-COPY buy.py /app
-WORKDIR /app
+COPY buy.py /home
+WORKDIR /home
 CMD python ./buy.py
