@@ -3,7 +3,7 @@ image: docker:stable
 services:
 #  - docker:dind
   - name: docker:dind
-#    command: ["--insecure-registry=registry.local:5000"]
+    command: ["--insecure-registry=registry.local:5000"]
 
 
 variables:
@@ -21,5 +21,5 @@ before_script:
 build:
   stage: build
   script:
-    - docker build --tag egaraev/trading:latest .
+    - docker build --tag egaraev/trading .
     - docker push egaraev/trading
