@@ -1,0 +1,24 @@
+image: docker:stable
+
+services:
+#  - docker:dind
+  - name: docker:dind
+    command: ["--insecure-registry=registry.local:5000"]
+
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_DRIVER: overlay2
+
+before_script:
+#  - docker info
+#  - docker run -v /etc/hosts:/hosts -i alpine:latest sh -c "echo 192.168.1.128 registry.local > /hosts"
+  - docker run -v /etc/hosts:/hosts -i docker:stable sh -c "echo 192.168.1.128 registry.local > /hosts"
+
+#  - echo '192.168.1.127 registry.local' >> /etc/hosts
+#  - docker login -u $DASH_DOCKER_REGISTRY_USER -p $DASH_DOCKER_REGISTRY_PASSWORD $DASH_DOCKER_REGISTRY_HOST
+
+build:
+  stage: build
+  script:
+    - docker build --tag registry.local:5000/trading .
+    - docker push registry.local:5000/trading
