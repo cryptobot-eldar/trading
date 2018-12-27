@@ -16,10 +16,10 @@ before_script:
 #  - docker run -v /etc/hosts:/hosts -i alpine:latest sh -c "echo 192.168.1.128 registry.local > /hosts"
 
 #  - echo '192.168.1.127 registry.local' >> /etc/hosts
-#  - docker login -u egaraev -p Kax0vka44609 hub.docker.com
+#  - docker login -u egaraev -p password hub.docker.com
 
 build:
   stage: build
   script:
-    - docker build --tag egaraev/trading .
+    - docker build --tag egaraev/trading:latest .
     - docker push egaraev/trading
