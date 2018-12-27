@@ -22,4 +22,4 @@ build:
   stage: build
   script:
     - docker build --tag egaraev/trading .
-    - docker push egaraev/trading
+    - docker push egaraev/trading:latest
