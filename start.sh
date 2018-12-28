@@ -1,6 +1,6 @@
 #!/bin/bash
-exec &>>/var/log/cron.log
-exec "$@"
+#exec &>>/var/log/work.log
+#exec "$@"
 while true
 do
 SERVICE0='buy.py'
