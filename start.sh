@@ -1,6 +1,7 @@
 #!/bin/bash
 exec &>>/var/log/cron.log
-
+while true
+do
 SERVICE0='buy.py'
 
 if ps ax | grep -v grep | grep $SERVICE0 > /dev/null
@@ -22,3 +23,6 @@ else
     echo there is no such "$SERVICE1 service, starting"
     python /usr/local/bin/sell.py
 fi
+
+sleep 10
+done
