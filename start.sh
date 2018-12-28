@@ -1,4 +1,5 @@
 #!/bin/bash
+exec &>>/var/log/cron.log
 
 SERVICE0='buy.py'
 
