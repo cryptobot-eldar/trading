@@ -8,7 +8,7 @@ then
     echo "$SERVICE0 service running "
 else
     echo there is no such "$SERVICE0 service, starting"
-    python /home/buy.py
+    python /usr/local/bin/buy.py
 fi
 
 
@@ -20,5 +20,5 @@ then
     echo "$SERVICE1 service running "
 else
     echo there is no such "$SERVICE1 service, starting"
-    python /home/sell.py
+    python /usr/local/bin/sell.py
 fi
