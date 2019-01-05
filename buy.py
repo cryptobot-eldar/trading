@@ -111,7 +111,7 @@ def tick():
 
 
                 try:
-                    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+                    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
                     cursor = db.cursor()
 
                     serf = (newbid * bought_quantity_sql - bought_price_sql * bought_quantity_sql)
@@ -165,7 +165,7 @@ def tick():
                             try:
                                 printed = ('    2 - We already have ' + str(
                                     format_float(bought_quantity_sql)) + '  ' + market + ' on our balance')
-                                db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+                                db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
                                 cursor = db.cursor()
                                 cursor.execute(
                                     'insert into logs(date, log_entry) values("%s", "%s")' % (currenttime, printed))
@@ -181,7 +181,7 @@ def tick():
                             try:
                                 printed = ('    3 - We already have ' + str(
                                     float(status_orders(market, 2))) + ' units of ' + market + ' on our balance')
-                                db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+                                db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
                                 cursor = db.cursor()
                                 cursor.execute(
                                     'insert into logs(date, log_entry) values("%s", "%s")' % (currenttime, printed))
@@ -197,7 +197,7 @@ def tick():
                                 printed = ('    4- Purchasing (by ai_ha) '  + str(
                                     format_float(buy_quantity)) + ' units of ' + market + ' for ' + str(
                                     format_float(newask)))
-                                db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+                                db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
                                 cursor = db.cursor()
                                 cursor.execute(
                                     'insert into logs(date, log_entry) values("%s", "%s")' % (currenttime, printed))
@@ -213,7 +213,7 @@ def tick():
                                 sys.exit(1)
                             finally:
                                 db.close()
-                            #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New purchase", printed, "localhost")
+                            #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New purchase", printed, "database-service")
                             break
 
 
@@ -223,7 +223,7 @@ def tick():
                 if debug_mode == 1:
                     try:
                         printed = ("    XXX - Bot is working with " + market)
-                        db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+                        db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
                         cursor = db.cursor()
                         cursor.execute(
                             'insert into logs(date, log_entry) values("%s", "%s")' % (
@@ -249,7 +249,7 @@ def tick():
 
 
 def heikin_ashi(marketname, value):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market = marketname
     cursor.execute("SELECT * FROM markets WHERE market = '%s'" % market)
@@ -280,7 +280,7 @@ def Mail(FROM,TO,SUBJECT,TEXT,SERVER):
 
 
 def percent_serf_min(marketname):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market=marketname
     cursor.execute("SELECT percent_serf_min FROM orders WHERE active =1 and market = '%s'" % market)
@@ -293,7 +293,7 @@ def percent_serf_min(marketname):
 
 #Allowed currencies function for SQL
 def available_market_list(marketname):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market = marketname
     cursor.execute("SELECT * FROM markets WHERE active =1 and market = '%s'" % market)
@@ -306,7 +306,7 @@ def available_market_list(marketname):
 
 
 def buysellorders_sql(marketname, value):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market = marketname
     cursor.execute("SELECT * FROM markets WHERE market = '%s'" % market)
@@ -320,7 +320,7 @@ def buysellorders_sql(marketname, value):
 
 
 def parameters():
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     cursor.execute("SELECT * FROM parameters")
     r = cursor.fetchall()
@@ -332,7 +332,7 @@ def parameters():
 
 
 def ai_prediction(marketname):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market = marketname
     cursor.execute("SELECT ai_direction FROM markets WHERE active =1 and market = '%s'" % market)
@@ -346,7 +346,7 @@ def ai_prediction(marketname):
 
 
 def quantity_orders(marketname):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market=marketname
     cursor.execute("SELECT * FROM orders WHERE active = 1 and market = '%s'" % market)
@@ -362,7 +362,7 @@ def quantity_orders(marketname):
 
 
 def order_count():
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     #market=marketname
     cursor.execute("SELECT COUNT(*) FROM orders where active=1")
@@ -377,7 +377,7 @@ def order_count():
 
 
 def percent_serf_max(marketname):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market=marketname
     cursor.execute("SELECT percent_serf_max FROM orders WHERE active =1 and market = '%s'" % market)
@@ -389,7 +389,7 @@ def percent_serf_max(marketname):
 
 #Check active orders in mysql
 def timestamp_orders(marketname):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market=marketname
     cursor.execute("SELECT * FROM orders WHERE active = 1 and market = '%s'" % market)
@@ -403,7 +403,7 @@ def timestamp_orders(marketname):
 
 #Check first iteration orders in mysql
 def iteration_orders(marketname):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market=marketname
     cursor.execute("SELECT * FROM orders WHERE active = 1 and market = '%s'" % market)
@@ -417,7 +417,7 @@ def iteration_orders(marketname):
 
 #Check active orders in mysql
 def active_orders(marketname):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market=marketname
     cursor.execute("SELECT * FROM orders WHERE active = 1 and market = '%s'" % market)
@@ -432,7 +432,7 @@ def active_orders(marketname):
 #Check the status of active orders
 # 2 - is quantity, 3 -is price, 4 - active/passive
 def status_orders(marketname, value):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market=marketname
     cursor.execute("SELECT * FROM orders WHERE active = 1 and market = '%s'" % market)

@@ -2,7 +2,14 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../devops/.idea/devops.iml" filepath="$PROJECT_DIR$/../devops/.idea/devops.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../heikin/.idea/heikin.iml" filepath="$PROJECT_DIR$/../heikin/.idea/heikin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../labapp/.idea/labapp.iml" filepath="$PROJECT_DIR$/../../labapp/.idea/labapp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../matplotcharts/.idea/matplotcharts.iml" filepath="$PROJECT_DIR$/../matplotcharts/.idea/matplotcharts.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../neuralanalyze/.idea/neuralanalyze.iml" filepath="$PROJECT_DIR$/../neuralanalyze/.idea/neuralanalyze.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../tools/.idea/tools.iml" filepath="$PROJECT_DIR$/../tools/.idea/tools.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/trading.iml" filepath="$PROJECT_DIR$/.idea/trading.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../webinterface/.idea/webinterface.iml" filepath="$PROJECT_DIR$/../webinterface/.idea/webinterface.iml" />
     </modules>
   </component>
 </project>

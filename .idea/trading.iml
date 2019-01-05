@@ -4,6 +4,13 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="heikin" />
+    <orderEntry type="module" module-name="matplotcharts" />
+    <orderEntry type="module" module-name="neuralanalyze" />
+    <orderEntry type="module" module-name="tools" />
+    <orderEntry type="module" module-name="webinterface" />
+    <orderEntry type="module" module-name="devops" />
+    <orderEntry type="module" module-name="labapp" />
   </component>
   <component name="TestRunnerService">
     <option name="projectConfiguration" value="Nosetests" />

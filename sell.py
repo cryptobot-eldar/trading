@@ -150,7 +150,7 @@ def tick():
 
 
                 try:
-                    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+                    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
                     cursor = db.cursor()
 
                     serf = (newbid * bought_quantity_sql - bought_price_sql * bought_quantity_sql)
@@ -193,7 +193,7 @@ def tick():
                         # print ('22 - Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
                         try:
                             printed = ('    33 -Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(newbid)) + '  and getting or loosing  ' + str(format_float(serf*BTC_price)) + ' USD')
-                            db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+                            db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
                             cursor = db.cursor()
                             cursor.execute('insert into logs(date, log_entry) values("%s", "%s")' % (currenttime, printed))
                             cursor.execute('update orders set reason_close =%s where active=1 and market =%s', ("33 , Force_stop_bot p:    " + str(format_float(newbid)) + "    t:   " + str(currenttime),market))
@@ -204,7 +204,7 @@ def tick():
                             sys.exit(1)
                         finally:
                             db.close()
-                        #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed, "localhost")
+                        #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed, "database-service")
 
 
 
@@ -215,7 +215,7 @@ def tick():
                 if debug_mode == 1:
                     try:
                         printed = ("    XXX - Bot is working with " + market)
-                        db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+                        db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
                         cursor = db.cursor()
                         cursor.execute(
                             'insert into logs(date, log_entry) values("%s", "%s")' % (
@@ -248,7 +248,7 @@ def tick():
                                         sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
                                     format_float(newbid)) + '  and getting   ' + str(
                                     format_float(serf * BTC_price)) + ' USD')
-                                db = MySQLdb.connect("localhost", "cryptouser", "123456",
+                                db = MySQLdb.connect("database-service", "cryptouser", "123456",
                                                      "cryptodb")
                                 cursor = db.cursor()
                                 cursor.execute(
@@ -276,7 +276,7 @@ def tick():
                                 sys.exit(1)
                             finally:
                                 db.close()
-                                # Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed,"localhost")
+                                # Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed,"database-service")
 
 
                         if (currentopen <= currentlow and prevclose <= currentopen and  currentopen < currenthigh and last>prevclose and prevhigh <= currentopen): # or (currentopen <= currentlow and currentopen < currenthigh and last>prevclose):
@@ -284,7 +284,7 @@ def tick():
                             try:
                                 printed = (
                                 "    5 - We have GREEN candle for " + market + " and let`s wait it to be up")
-                                db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+                                db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
                                 cursor = db.cursor()
                                 cursor.execute(
                                     'insert into logs(date, log_entry) values("%s", "%s")' % (
@@ -303,7 +303,7 @@ def tick():
 
                             try:
                                 printed = ("    6 - We have good short term trend for " + market)
-                                db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+                                db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
                                 cursor = db.cursor()
                                 cursor.execute(
                                     'insert into logs(date, log_entry) values("%s", "%s")' % (
@@ -328,7 +328,7 @@ def tick():
                                             sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
                                         format_float(newbid)) + '  and getting   ' + str(
                                         format_float(serf*BTC_price)) + ' USD')
-                                    db = MySQLdb.connect("localhost", "cryptouser", "123456",
+                                    db = MySQLdb.connect("database-service", "cryptouser", "123456",
                                                          "cryptodb")
                                     cursor = db.cursor()
                                     cursor.execute(
@@ -374,7 +374,7 @@ def tick():
                                             sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
                                         format_float(newbid)) + '  and getting   ' + str(
                                         format_float(serf*BTC_price)) + ' USD' )
-                                    db = MySQLdb.connect("localhost", "cryptouser", "123456",
+                                    db = MySQLdb.connect("database-service", "cryptouser", "123456",
                                                          "cryptodb")
                                     cursor = db.cursor()
                                     cursor.execute(
@@ -401,7 +401,7 @@ def tick():
                                     sys.exit(1)
                                 finally:
                                     db.close()
-                                #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed,"localhost")
+                                #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed,"database-service")
 
 
 
@@ -416,7 +416,7 @@ def tick():
                                             sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
                                         format_float(newbid)) + '  and getting   ' + str(
                                         format_float(serf*BTC_price)) + ' USD')
-                                    db = MySQLdb.connect("localhost", "cryptouser", "123456",
+                                    db = MySQLdb.connect("database-service", "cryptouser", "123456",
                                                          "cryptodb")
                                     cursor = db.cursor()
                                     cursor.execute(
@@ -448,7 +448,7 @@ def tick():
                                     sys.exit(1)
                                 finally:
                                     db.close()
-                                #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed,"localhost")
+                                #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed,"database-service")
 
 
 
@@ -463,7 +463,7 @@ def tick():
 #                                            sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
 #                                        format_float(newbid)) + '  and getting   ' + str(
 #                                        format_float(serf*BTC_price)) + ' USD')
-#                                    db = MySQLdb.connect("localhost", "cryptouser", "123456",
+#                                    db = MySQLdb.connect("database-service", "cryptouser", "123456",
 #                                                         "cryptodb")
 #                                    cursor = db.cursor()
 #                                    cursor.execute(
@@ -495,7 +495,7 @@ def tick():
 #                                    sys.exit(1)
 #                                finally:
 #                                    db.close()
-                                #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed,"localhost")
+                                #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed,"database-service")
 
 
 #                            elif serf >= buy_size * profit / 3 and (
@@ -507,7 +507,7 @@ def tick():
 #                                            sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
 #                                        format_float(newbid)) + '  and losing  ' + str(
 #                                        format_float(serf)) + ' USD' )
-#                                    db = MySQLdb.connect("localhost", "cryptouser", "123456",
+#                                    db = MySQLdb.connect("database-service", "cryptouser", "123456",
 #                                                         "cryptodb")
 #                                    cursor = db.cursor()
 #                                    cursor.execute(
@@ -547,7 +547,7 @@ def tick():
                                             sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
                                         format_float(newbid)) + '  and losing  ' + str(
                                         format_float(serf*BTC_price)) + ' USD' )
-                                    db = MySQLdb.connect("localhost", "cryptouser", "123456",
+                                    db = MySQLdb.connect("database-service", "cryptouser", "123456",
                                                          "cryptodb")
                                     cursor = db.cursor()
                                     cursor.execute(
@@ -572,7 +572,7 @@ def tick():
                                     sys.exit(1)
                                 finally:
                                     db.close()
-                                #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed,"localhost")
+                                #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed,"database-service")
 
                             elif (active == 1) and serf>0  and (sell_signal == 1 or  sell_signal == 2) and procent_serf<0.4 and last<hourcurrentopen:   # #WAS profit2
 
@@ -584,7 +584,7 @@ def tick():
                                             sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
                                         format_float(newbid)) + '  and getting  ' + str(
                                         format_float(serf*BTC_price)) + ' USD'  )
-                                    db = MySQLdb.connect("localhost", "cryptouser", "123456",
+                                    db = MySQLdb.connect("database-service", "cryptouser", "123456",
                                                          "cryptodb")
                                     cursor = db.cursor()
                                     cursor.execute(
@@ -609,7 +609,7 @@ def tick():
                                     sys.exit(1)
                                 finally:
                                     db.close()
-                                #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed, "localhost")
+                                #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed, "database-service")
 
 
                             elif serf>0 and max_percent_sql-procent_serf>=0.5 and max_percent_sql>=2 and  last<currentopen and last<hourcurrentopen and hourprevopen>hourprevclose:  # # WAS profit2
@@ -622,7 +622,7 @@ def tick():
                                                 sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
                                             format_float(newbid)) + '  and getting   ' + str(
                                             format_float(serf)) + ' USD')
-                                        db = MySQLdb.connect("localhost", "cryptouser", "123456",
+                                        db = MySQLdb.connect("database-service", "cryptouser", "123456",
                                                              "cryptodb")
                                         cursor = db.cursor()
                                         cursor.execute(
@@ -651,7 +651,7 @@ def tick():
                                         sys.exit(1)
                                     finally:
                                         db.close()
-                                    #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed, "localhost")
+                                    #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed, "database-service")
 
 #                            elif (active == 1) and serf > 0 and percent_chg<0:  # #WAS profit2
 
@@ -663,7 +663,7 @@ def tick():
 #                                                    sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
 #                                                format_float(newbid)) + '  and getting  ' + str(
 #                                                format_float(serf)) + ' USD')
-#                                            db = MySQLdb.connect("localhost", "cryptouser", "123456",
+#                                            db = MySQLdb.connect("database-service", "cryptouser", "123456",
 #                                                                 "cryptodb")
 #                                            cursor = db.cursor()
 #                                            cursor.execute(
@@ -702,7 +702,7 @@ def tick():
                                             sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
                                         format_float(newbid)) + '  and losing  ' + str(
                                         format_float(serf*BTC_price)) + ' USD' )
-                                    db = MySQLdb.connect("localhost", "cryptouser", "123456",
+                                    db = MySQLdb.connect("database-service", "cryptouser", "123456",
                                                          "cryptodb")
                                     cursor = db.cursor()
                                     cursor.execute(
@@ -729,7 +729,7 @@ def tick():
                                     sys.exit(1)
                                 finally:
                                     db.close()
-                                #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed, "localhost")
+                                #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed, "database-service")
 
                             else:
 
@@ -749,7 +749,7 @@ def tick():
 
 
 def heikin_ashi(marketname, value):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market = marketname
     cursor.execute("SELECT * FROM markets WHERE market = '%s'" % market)
@@ -780,7 +780,7 @@ def Mail(FROM,TO,SUBJECT,TEXT,SERVER):
 
 
 def percent_serf_min(marketname):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market=marketname
     cursor.execute("SELECT percent_serf_min FROM orders WHERE active =1 and market = '%s'" % market)
@@ -793,7 +793,7 @@ def percent_serf_min(marketname):
 
 #Allowed currencies function for SQL
 def available_market_list(marketname):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market = marketname
     cursor.execute("SELECT * FROM orders WHERE active =1 and market = '%s'" % market)
@@ -808,7 +808,7 @@ def available_market_list(marketname):
 
 
 def parameters():
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     cursor.execute("SELECT * FROM parameters")
     r = cursor.fetchall()
@@ -820,7 +820,7 @@ def parameters():
 
 
 def ai_prediction(marketname):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market = marketname
     cursor.execute("SELECT ai_direction FROM markets WHERE active =1 and market = '%s'" % market)
@@ -831,7 +831,7 @@ def ai_prediction(marketname):
     return 0
 
 def ai_prediction_price(marketname):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market = marketname
     cursor.execute("SELECT ai_price FROM markets WHERE active =1 and ai_direction='UP' and market = '%s'" % market)
@@ -850,7 +850,7 @@ def ai_prediction_price(marketname):
 
 
 def summ_serf():
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     #market=marketname
     cursor.execute("SELECT SUM(serf_usd) FROM orders where active=0")
@@ -869,7 +869,7 @@ def summ_serf():
 
 
 def order_count():
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     #market=marketname
     cursor.execute("SELECT COUNT(*) FROM orders where active=1")
@@ -885,7 +885,7 @@ def order_count():
 
 
 def percent_serf_max(marketname):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market=marketname
     cursor.execute("SELECT percent_serf_max FROM orders WHERE active =1 and market = '%s'" % market)
@@ -897,7 +897,7 @@ def percent_serf_max(marketname):
 
 #Check active orders in mysql
 def timestamp_orders(marketname):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market=marketname
     cursor.execute("SELECT * FROM orders WHERE active = 1 and market = '%s'" % market)
@@ -911,7 +911,7 @@ def timestamp_orders(marketname):
 
 #Check first iteration orders in mysql
 def iteration_orders(marketname):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market=marketname
     cursor.execute("SELECT * FROM orders WHERE active = 1 and market = '%s'" % market)
@@ -925,7 +925,7 @@ def iteration_orders(marketname):
 
 #Check active orders in mysql
 def active_orders(marketname):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market=marketname
     cursor.execute("SELECT * FROM orders WHERE active = 1 and market = '%s'" % market)
@@ -940,7 +940,7 @@ def active_orders(marketname):
 #Check the status of active orders
 # 2 - is quantity, 3 -is price, 4 - active/passive
 def status_orders(marketname, value):
-    db = MySQLdb.connect("localhost", "cryptouser", "123456", "cryptodb")
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
     cursor = db.cursor()
     market=marketname
     cursor.execute("SELECT * FROM orders WHERE active = 1 and market = '%s'" % market)
