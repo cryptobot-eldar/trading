@@ -37,7 +37,7 @@ def tick():
             if available_market_list(summary['MarketName']):
                 market = summary['MarketName']
                 #Candle analisys
-                #print market
+                print market
                 lastcandle = get_candles(market, 'thirtymin')['result'][-1:]
 
                 currentopen = float(lastcandle[0]['O'])
@@ -107,7 +107,7 @@ def tick():
 
 
 
-                #print market
+                print market
 
 
                 try:
@@ -152,8 +152,8 @@ def tick():
 
 
 #FIRST ITERATION - BUY
-                #spread=((ask/bid)-1)*100
-                #print market, spread
+                spread=((ask/bid)-1)*100
+                print market, spread
 
                 if ((stop_bot == 0) and (HA_trend == "UP" or HA_trend == "Revers-UP" or HA_trend == "STABLE") and (HAH_trend == "UP" or HAH_trend == "Revers-UP") and (HAD_trend=="UP" or HAD_trend == "Revers-UP" or HAD_trend == "STABLE") and stop_bot_force == 0)  and (currtime-ha_time_second<2000) and last>fivehourcurrentopen and last>currentopen  and (currtime-strike_time>36000) and (currtime-strike_time2>36000) and last>fivehourcurrentopen and last>currentopen and fivehourprevopen<fivehourprevclose: # and current_order_count<=15:
                         #balance_res = get_balance_from_market(market)
