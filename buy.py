@@ -28,6 +28,7 @@ def tick():
     currtime = int(time.time())
     btc_trend = parameters()[12]
     debug_mode=parameters()[10]
+    max_orders = parameters()[5]
     #print c.get_market_summaries().json()['result']
 
 
@@ -37,23 +38,10 @@ def tick():
             if available_market_list(summary['MarketName']):
                 market = summary['MarketName']
                 #Candle analisys
-                print market
                 lastcandle = get_candles(market, 'thirtymin')['result'][-1:]
 
                 currentopen = float(lastcandle[0]['O'])
-
-                previouscandle = get_candles(market, 'thirtymin')['result'][-2:]
-
-                lastcandle5 = get_candles(market, 'fivemin')['result'][-1:]
-
-                previouscandle5 = get_candles(market, 'fivemin')['result'][-2:]
-
-
-                hourlastcandle = get_candles(market, 'hour')['result'][-1:]
-
-
-                hourprevcandle = get_candles(market, 'hour')['result'][-2:]
-
+                currenthigh = float(lastcandle[0]['H'])
 
                 hourpreviouscandle4 = get_candles(market, 'hour')['result'][-5:]
                 hourprevopen4 = float(hourpreviouscandle4[0]['O'])
@@ -64,8 +52,18 @@ def tick():
 
                 hourpreviouscandle5 = get_candles(market, 'hour')['result'][-6:]
                 hourprevclose5 = float(hourpreviouscandle5[0]['C'])
+
                 fivehourprevopen = hourprevopen9
                 fivehourprevclose = hourprevclose5
+
+
+                lastcandle5 = get_candles(market, 'fivemin')['result'][-1:]
+                currentlow5 = float(lastcandle5[0]['L'])
+                currentopen5 = float(lastcandle5[0]['O'])
+                currenthigh5 = float(lastcandle5[0]['H'])
+                hourlastcandle = get_candles(market, 'hour')['result'][-1:]
+                hourcurrentopen = float(hourlastcandle[0]['O'])
+                hourcurrenthigh = float(hourlastcandle[0]['H'])
 
 
                 timestamp = int(time.time())
@@ -102,6 +100,44 @@ def tick():
                 volume_sql=int(heikin_ashi(market, 22))
                 strike_time = heikin_ashi(market, 24)
                 strike_time2 = heikin_ashi(market, 27)
+                percent_sql=float("{0:.2f}".format(heikin_ashi(market, 21)))
+                volume_sql=int(heikin_ashi(market, 22))
+                candles = str(heikin_ashi(market, 28))
+                candles_signal_short = str(heikin_ashi(market, 29))
+                candles_signal_long = str(heikin_ashi(market, 30))
+                current_order_count = order_count()
+
+                fivemin='NONE'
+                thirtymin='NONE'
+                hour='NONE'
+                candles_status='OK'
+
+
+                if last>currentopen5:
+                    fivemin='U'
+                elif last==currenthigh5:
+                    fivemin='H'
+                else:
+                    fivemin='D'
+
+                if last>currentopen:
+                    thirtymin='U'
+                elif last==currenthigh:
+                    thirtymin='H'
+                else:
+                    thirtymin='D'
+
+                if last>hourcurrentopen:
+                    hour='U'
+                elif last==hourcurrenthigh:
+                    hour='H'
+                else:
+                    hour='D'
+
+                if fivemin=='D' and thirtymin=='D' and fivemin=='D':
+                    candles_status='DOWN'
+                else:
+                    candles_status='OK'
 
 
 
@@ -114,10 +150,10 @@ def tick():
                     db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
                     cursor = db.cursor()
 
-                    serf = (newbid * bought_quantity_sql - bought_price_sql * bought_quantity_sql)
+                    serf = float("{0:.8f}".format(newbid * bought_quantity_sql - bought_price_sql * bought_quantity_sql))
                     if bought_price_sql!=0:
 
-                        procent_serf = float(((newbid / bought_price_sql) - 1) * 100)
+                        procent_serf = float("{0:.2f}".format(((newbid / bought_price_sql) - 1) * 100))
                         #print market, procent_serf
 
                         if procent_serf>=percent_serf_max(market):
@@ -155,7 +191,9 @@ def tick():
                 #spread=((ask/bid)-1)*100
                 #print market, spread
 
-                if ((stop_bot == 0) and (HA_trend == "UP" or HA_trend == "Revers-UP" or HA_trend == "STABLE")): # and current_order_count<=15:
+                if ((stop_bot == 0) and (HA_trend == "UP" or HA_trend == "Revers-UP" or HA_trend == "STABLE") and (
+                                HAD_trend == "UP" or HAD_trend == "Revers-UP" or HAD_trend == "STABLE") and (HAH_trend == "UP" or HAH_trend == "Revers-UP") and stop_bot_force == 0) and (
+                            currtime - ha_time_second < 2000) and (currtime - strike_time > 36000) and (currtime - strike_time2 > 36000) and current_order_count<=max_orders and last>fivehourcurrentopen and fivehourprevopen<fivehourprevclose and last>currentopen and fivemin!='D' and hour!='D' and percent_sql>0.0 and candles_status!='DOWN': # and current_order_count<=15:
                         #balance_res = get_balance_from_market(market)
                         #current_balance = balance_res['result']['Available']
 
@@ -445,6 +483,15 @@ def status_orders(marketname, value):
     return 0
 
 
+def order_count():
+    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
+    cursor = db.cursor()
+    #market=marketname
+    cursor.execute("SELECT COUNT(*) FROM orders where active=1")
+    r = cursor.fetchall()
+    for row in r:
+        return row[0]
+    return 0
 
 
 

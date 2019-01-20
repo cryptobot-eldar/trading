@@ -49,51 +49,31 @@ def tick():
         try:
             if available_market_list(summary['MarketName']):
                 market = summary['MarketName']
+
                 #Candle analisys
-                #print market
                 lastcandle = get_candles(market, 'thirtymin')['result'][-1:]
                 currentlow = float(lastcandle[0]['L'])
                 currentopen = float(lastcandle[0]['O'])
-                currentclose = float(lastcandle[0]['C'])
                 currenthigh = float(lastcandle[0]['H'])
                 previouscandle = get_candles(market, 'thirtymin')['result'][-2:]
-                prevlow = float(previouscandle[0]['L'])
-                prevopen = float(previouscandle[0]['O'])
                 prevclose = float(previouscandle[0]['C'])
-                prevhigh = float(previouscandle[0]['H'])
                 lastcandle5 = get_candles(market, 'fivemin')['result'][-1:]
                 currentlow5 = float(lastcandle5[0]['L'])
                 currentopen5 = float(lastcandle5[0]['O'])
-                currentclose5 = float(lastcandle5[0]['C'])
                 currenthigh5 = float(lastcandle5[0]['H'])
                 previouscandle5 = get_candles(market, 'fivemin')['result'][-2:]
-                prevlow5 = float(previouscandle5[0]['L'])
-                prevopen5 = float(previouscandle5[0]['O'])
                 prevclose5 = float(previouscandle5[0]['C'])
-                prevhigh5 = float(previouscandle5[0]['H'])
-
                 hourlastcandle = get_candles(market, 'hour')['result'][-1:]
-                hourcurrentlow = float(hourlastcandle[0]['L'])
-                hourcurrenthigh = float(hourlastcandle[0]['H'])
                 hourcurrentopen = float(hourlastcandle[0]['O'])
-                hourcurrentclose = float(hourlastcandle[0]['C'])
-
+                hourcurrenthigh = float(hourlastcandle[0]['H'])
                 hourprevcandle = get_candles(market, 'hour')['result'][-2:]
                 hourprevopen = float(hourprevcandle[0]['O'])
                 hourprevclose = float(hourprevcandle[0]['C'])
-
-                hourpreviouscandle4 = get_candles(market, 'hour')['result'][-5:]
-                hourprevopen4 = float(hourpreviouscandle4[0]['O'])
-                fivehourcurrentopen = hourprevopen4
-
-                hourpreviouscandle9 = get_candles(market, 'hour')['result'][-10:]
-                hourprevopen9 = float(hourpreviouscandle9[0]['O'])
-
-                hourpreviouscandle5 = get_candles(market, 'hour')['result'][-6:]
-                hourprevclose5 = float(hourpreviouscandle5[0]['C'])
-                fivehourprevopen = hourprevopen9
-                fivehourprevclose = hourprevclose5
-
+                fivemin='NONE'
+                thirtymin='NONE'
+                hour='NONE'
+                candles_signal_short = str(heikin_ashi(market, 29))
+                candles_signal_long = str(heikin_ashi(market, 30))
 
                 timestamp = int(time.time())
                 day_close = summary['PrevDay']   #Getting day of closing order
@@ -102,14 +82,14 @@ def tick():
                 bid = float(summary['Bid'])    #sell price
                 ask = float(summary['Ask'])    #buy price
             #How much market has been changed
-                percent_chg = float(((last / day_close) - 1) * 100)
+
 
             #HOW MUCH TO BUY
                 buy_quantity = buy_size / last
             #BOUGHT PRICE
 
                 newbid=bid - bid*0.002
-                newask=ask + ask*0.002
+
 
                 #bought_price = get_closed_orders(market, 'PricePerUnit')
                 #print market
@@ -132,21 +112,31 @@ def tick():
                 strike_time = heikin_ashi(market, 24)
                 strike_time2 = heikin_ashi(market, 27)
                 ai_time_second = heikin_ashi(market, 8)
+                profit = parameters()[3]
+                slow_market=heikin_ashi(market, 3)
+                normal_candles=heikin_ashi(market, 19)
 
-
-
-                if (HA_trend == "DOWN") or (btc_trend == "DANGER") or (HAD_trend == "DOWN"):
-                    profit = parameters()[3] / 1.5
-                elif (HAD_trend == "DOWN" or HAD_trend == "Revers-DOWN") and (HA_trend=="DOWN" or HA_trend=="Revers-DOWN") and (HAH_trend=="DOWN" or HAH_trend=="Revers-DOWN"):
-                    profit = parameters()[3] / 2
-                elif (timestamp - timestamp_old > 259200) and (HA_trend!="UP" or HA_trend!="Revers-UP"):
-                    profit = parameters()[3] / 2.5
-                elif (timestamp - timestamp_old > 518400) and (HA_trend != "UP" or HA_trend != "Revers-UP"):
-                    profit = parameters()[3] / 3
+                if last>currentopen5:
+                    fivemin='U'
+                elif last==currenthigh5:
+                    fivemin='H'
                 else:
-                    profit = parameters()[3]
+                    fivemin='D'
 
-                #print market
+                if last>currentopen:
+                    thirtymin='U'
+                elif last==currenthigh:
+                    thirtymin='H'
+                else:
+                    thirtymin='D'
+
+                if last>hourcurrentopen:
+                    hour='U'
+                elif last==hourcurrenthigh:
+                    hour='H'
+                else:
+                    hour='D'
+
 
 
                 try:
@@ -154,6 +144,7 @@ def tick():
                     cursor = db.cursor()
 
                     serf = (newbid * bought_quantity_sql - bought_price_sql * bought_quantity_sql)
+                    serf_usd = float("{0:.4f}".format(serf * BTC_price))
                     if bought_price_sql!=0:
 
                         #procent_serf = float(((newbid / bought_price_sql) - 1) * 100)
@@ -185,6 +176,7 @@ def tick():
 
                 #max_percent_sql = status_orders(market, 15)
                 max_percent_sql = float("{0:.2f}".format(status_orders(market, 15)))
+                min_percent_sql = float("{0:.2f}".format(status_orders(market, 24)))
                 #print market, procent_serf
 
 # Force Stop
@@ -238,38 +230,42 @@ def tick():
                         ##Check if we have completelly green candle
 
 
-                        if (serf > 0 and max_percent_sql - procent_serf >= 0.2 and 1 <= max_percent_sql >= 0.4) or (
-                                    serf > 0 and max_percent_sql - procent_serf >= 0.5 and 2 <= max_percent_sql >= 1) or (
-                                    serf > 0 and max_percent_sql - procent_serf >= 1 and max_percent_sql >= 2):
+                        if ((serf_usd > 0 and max_percent_sql - procent_serf >= 0.2 and 1.5>=max_percent_sql >= 1.0 and fivemin=='D') or (serf_usd > 0 and max_percent_sql - procent_serf >= 0.1 and 1.0>=max_percent_sql >= 0.7 )  or (serf_usd > 0 and max_percent_sql - procent_serf >= 0.5 and 2.0>=max_percent_sql >= 1.5 and fivemin=='D') or (serf_usd > 0 and max_percent_sql - procent_serf >= 1.0 and 3.0>=max_percent_sql >= 2.0 and fivemin=='D') or max_percent_sql>7.0 and slow_market==1)\
+                                    or  ((serf_usd > 0 and max_percent_sql - procent_serf >= 0.2 and 1.5>=max_percent_sql >= 0.8) or (serf_usd > 0 and max_percent_sql - procent_serf >= 1.5 and 3.0>=max_percent_sql >= 2.0 and fivemin=='D') or max_percent_sql>10.0  and slow_market==0):
                             try:
-
-                                printed = ('    12.21 -Selling ' + str(
-                                    format_float(
-                                        sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
-                                    format_float(newbid)) + '  and getting   ' + str(
-                                    format_float(serf * BTC_price)) + ' USD')
-                                db = MySQLdb.connect("database-service", "cryptouser", "123456",
-                                                     "cryptodb")
+                                printed = ('   6 -Selling ' + str(format_float(
+                                    sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
+                                    format_float(newbid)) + '  and getting  +' + str(format_float(
+                                    ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' + ' or ' + str(
+                                    format_float((
+                                                     newbid * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
+                                db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
                                 cursor = db.cursor()
+                                cursor.execute('insert into logs(date, log_entry) values("%s", "%s")' % (
+                                    currenttime, printed))
+                                # cursor.execute('update orders set active = 0, reason_close = "12 Take profit" where market =("%s")' % market)
                                 cursor.execute(
-                                    'insert into logs(date, log_entry) values("%s", "%s")' % (
-                                        currenttime, printed))
-                                cursor.execute(
-                                    'update orders set reason_close =%s where active=1 and market =%s',
-                                    (
-                                        "12.21 TP SELL, p:   " + str(
-                                            format_float(newbid)) + "   t:    " + str(currenttime),
+                                    'update orders set reason_close =%s where active=1 and market =%s', (
+                                        "4  TP , price:    " + str(
+                                            format_float(newbid)) + "    time:   " + str(currenttime) +
+                                        '  BTC: ' + str(btc_trend) + '  HAD: ' + str(HAD_trend) + ' HA: ' + str(
+                                            HA_trend) + ' HAH: ' + str(HAH_trend) + ' HC: ' + str(
+                                            hour) + ' 30mC: ' + str(thirtymin) + ' 5mC: ' + str(fivemin) + ' CS ' + str(
+                                            candles_signal_short) + ' ' + str(candles_signal_long) + '  AI:' + str(
+                                            ai_prediction(market)),
                                         market))
+                                if sell_signal == 0:
+                                    cursor.execute(
+                                        'update orders set sell = 4 where active=1 and market =("%s")' % market)
+                                if max_percent_sql > profit / 1.5:
+                                    cursor.execute(
+                                        "update markets set strike_time= %s  where market = %s",
+                                        (currtime, market))
                                 cursor.execute(
-                                    "update orders set sell_time=%s  where market = %s and active =1",
-                                    (currtime, market))
-                                cursor.execute(
-                                    'update orders set sell = 4 where active=1 and market =("%s")' % market)
-                                cursor.execute(
-                                    'update orders set active = 0 where market =("%s")' % market)
-                                newvalue = summ_serf() + serf
-                                cursor.execute('insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
-                                currenttime, newvalue, market))
+                                    "update orders set open_sell = %s, sell_time=%s  where market = %s and active =1",
+                                    (1, currtime, market))
+                                newvalue = summ_serf() + serf * BTC_price
+                                cursor.execute('insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (currenttime, newvalue, market))
                                 db.commit()
                             except MySQLdb.Error, e:
                                 print "Error %d: %s" % (e.args[0], e.args[1])
@@ -279,76 +275,86 @@ def tick():
                                 # Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed,"database-service")
 
 
-                        if (currentopen <= currentlow and prevclose <= currentopen and  currentopen < currenthigh and last>prevclose and prevhigh <= currentopen): # or (currentopen <= currentlow and currentopen < currenthigh and last>prevclose):
-                            # print ("We have GREEN candle for " + market + " and it is better to wait, before sell")
-                            try:
-                                printed = (
-                                "    5 - We have GREEN candle for " + market + " and let`s wait it to be up")
-                                db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
-                                cursor = db.cursor()
-                                cursor.execute(
-                                    'insert into logs(date, log_entry) values("%s", "%s")' % (
-                                    currenttime, printed))
-                                db.commit()
-                            except MySQLdb.Error, e:
-                                print "Error %d: %s" % (e.args[0], e.args[1])
-                                sys.exit(1)
-                            finally:
-                                db.close()
-                            pass
+                        if serf_usd > 0  and (((currentopen == currentlow and prevclose <= currentopen and currentopen < currenthigh and last > prevclose and thirtymin=='U') or (currentopen == currentlow and currentopen < currenthigh and last > prevclose and thirtymin=='U') )):  #and slow_market==1
 
-                        #elif currentopen5 == prevclose5 and currenthigh5 > currentopen5:  ## Need to add bought_price without sql
-                        elif (currentopen5 <= currentlow5 and prevclose5 <= currentopen5 and  currentopen5 < currenthigh5 and last>prevclose5 and prevhigh5 <= currentopen5): # or (currentopen5 <= currentlow5 and currentopen5 < currenthigh5 and last>prevclose5):
-                            # print ("We have good trend for " + market)
+                                print ("We have GREEN candle for " + market + " and it is better to wait, before sell")
+                                try:
+                                    printed = (
+                                        "    7 - We have GREEN candle for " + market + " and let`s wait it to be up")
+                                    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
+                                    cursor = db.cursor()
+                                    cursor.execute(
+                                        'insert into logs(date, log_entry) values("%s", "%s")' % (
+                                            currenttime, printed))
+                                    db.commit()
+                                except MySQLdb.Error, e:
+                                    print "Error %d: %s" % (e.args[0], e.args[1])
+                                    sys.exit(1)
+                                finally:
+                                    db.close()
+                                pass
 
-                            try:
-                                printed = ("    6 - We have good short term trend for " + market)
-                                db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
-                                cursor = db.cursor()
-                                cursor.execute(
-                                    'insert into logs(date, log_entry) values("%s", "%s")' % (
-                                    currenttime, printed))
-                                db.commit()
-                            except MySQLdb.Error, e:
-                                print "Error %d: %s" % (e.args[0], e.args[1])
-                                sys.exit(1)
-                            finally:
-                                db.close()
-                            pass
+
+
+
+                        elif serf_usd > 0  and (((currentopen5 == currentlow5 and prevclose5 <= currentopen5 and currentopen5 < currenthigh5 and last > prevclose5 and fivemin=='U') or (currentopen5 == currentlow5 and currentopen5 < currenthigh5 and last > prevclose5 and fivemin=='U'))): #and normal_candles==1
+                                print ("We have good trend for " + market)
+
+                                try:
+                                    printed = ("   8  - We have good short term trend for " + market)
+                                    db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
+                                    cursor = db.cursor()
+                                    cursor.execute(
+                                        'insert into logs(date, log_entry) values("%s", "%s")' % (
+                                            currenttime, printed))
+                                    db.commit()
+                                except MySQLdb.Error, e:
+                                    print "Error %d: %s" % (e.args[0], e.args[1])
+                                    sys.exit(1)
+                                finally:
+                                    db.close()
+                                pass
+
 
                         else:
-                            profit = parameters()[3]
-                            if  (active == 1) and newbid > bought_price_sql * (1 + profit):   # # WAS profit2
 
-                                # print ('22 - Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
+                            if  (serf_usd > 0 and max_percent_sql - procent_serf >= 1.0 and max_percent_sql >= 3.0 and slow_market==1) or (serf_usd > 0 and max_percent_sql - procent_serf >= 1.5 and max_percent_sql >= 3.0 and slow_market==0):    # # WAS profit2
+
                                 try:
-
-                                    printed = ('    8.1 -Strike selling ' + str(
+                                    printed = ('    10  - Trying to Sell ' + str(
                                         format_float(
                                             sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
-                                        format_float(newbid)) + '  and getting   ' + str(
-                                        format_float(serf*BTC_price)) + ' USD')
+                                        format_float(ask)) + '  and get  + ' + str(
+                                        format_float(serf * BTC_price)) + ' USD')
                                     db = MySQLdb.connect("database-service", "cryptouser", "123456",
                                                          "cryptodb")
                                     cursor = db.cursor()
                                     cursor.execute(
                                         'insert into logs(date, log_entry) values("%s", "%s")' % (
                                             currenttime, printed))
+                                    # cursor.execute('update orders set reason_close = "225 AI take profit" where active=1 and market =("%s")' % market)
                                     cursor.execute(
                                         'update orders set reason_close =%s where active=1 and market =%s',
                                         (
-                                            "8.1 Strike SELL, p:   " + str(
-                                                format_float(newbid)) + "   t:    " + str(currenttime),
-                                            market))
+                                            "6 Good TP SELL, price:  " + str(
+                                                format_float(last)) + "  time:   " + str(
+                                                currenttime) +
+                                            '  BTC: ' + str(btc_trend) + '  HAD: ' + str(HAD_trend) + ' HA: ' + str(
+                                                HA_trend) + ' HAH: ' + str(HAH_trend) + ' HC: ' + str(
+                                                hour) + ' 30mC: ' + str(thirtymin) + ' 5mC: ' + str(
+                                                fivemin) + ' CS ' + str(candles_signal_short) + ' ' + str(
+                                                candles_signal_long) + '  AI:' + str(
+                                                ai_prediction(market)), market))
                                     cursor.execute(
-                                        "update markets set strike_time= %s  where market = %s",
-                                        (currtime, market))
+                                        'update orders set sell = 6 where active=1 and market =("%s")' % market)
+                                    if max_percent_sql > profit / 1.5:
+                                        cursor.execute(
+                                            "update markets set strike_time= %s  where market = %s",
+                                            (currtime, market))
                                     cursor.execute(
-                                        "update orders set sell_time=%s  where market = %s and active =1",
-                                        (currtime, market))
-                                    cursor.execute(
-                                        'update orders set active = 0 where market =("%s")' % market)
-                                    newvalue = summ_serf() + serf
+                                        "update orders set open_sell = %s, sell_time=%s  where market = %s and active =1",
+                                        (1, currtime, market))
+                                    newvalue = summ_serf() + serf * BTC_price
                                     cursor.execute(
                                         'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
                                         currenttime, newvalue, market))
@@ -362,92 +368,95 @@ def tick():
 
 
 
-                            elif (active == 1) and (
-                                            HA_trend == 'DOWN' or HA_trend == 'Revers-DOWN') and newbid >= bought_price_sql * (
-                                1 + profit/2):  # # WAS profit2
+                            if serf_usd<0 and max_percent_sql<=0.5 and procent_serf==min_percent_sql and  timestamp - timestamp_old > 7200:
 
                                     # print ('22 - Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
-                                try:
-
-                                    printed = ('    8 -Selling ' + str(
-                                        format_float(
+                                    try:
+                                        printed = ('  12 -Selling ' + str(format_float(
                                             sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
-                                        format_float(newbid)) + '  and getting   ' + str(
-                                        format_float(serf*BTC_price)) + ' USD' )
-                                    db = MySQLdb.connect("database-service", "cryptouser", "123456",
-                                                         "cryptodb")
-                                    cursor = db.cursor()
-                                    cursor.execute(
-                                        'insert into logs(date, log_entry) values("%s", "%s")' % (
+                                            format_float(newbid)) + '  and losing  ' + str(format_float(
+                                            ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' + ' or ' + str(
+                                            format_float((
+                                                         newbid * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
+                                        db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
+                                        cursor = db.cursor()
+                                        cursor.execute('insert into logs(date, log_entry) values("%s", "%s")' % (
                                             currenttime, printed))
-                                    cursor.execute(
-                                        'update orders set reason_close =%s where active=1 and market =%s',
-                                        (
-                                            "8 HA SELL, p:   " + str(
-                                                format_float(newbid)) + "   t:    " + str(currenttime),
-                                            market))
-                                    cursor.execute(
-                                        "update orders set sell_time=%s  where market = %s and active =1",
-                                        (currtime, market))
-                                    cursor.execute(
-                                        'update orders set sell = 3 where active=1 and market =("%s")' % market)
-                                    cursor.execute(
-                                        'update orders set active = 0 where market =("%s")' % market)
-                                    newvalue=summ_serf()+serf
-                                    cursor.execute('insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (currenttime, newvalue, market))
-                                    db.commit()
-                                except MySQLdb.Error, e:
-                                    print "Error %d: %s" % (e.args[0], e.args[1])
-                                    sys.exit(1)
-                                finally:
-                                    db.close()
-                                #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed,"database-service")
+                                        # cursor.execute('update orders set active = 0, reason_close = "12 Take profit" where market =("%s")' % market)
+                                        cursor.execute(
+                                            'update orders set reason_close =%s where active=1 and market =%s', (
+                                                "3  fast SL, price:    " + str(
+                                                    format_float(newbid)) + "    time:   " + str(currenttime) +
+                                                '  BTC: ' + str(btc_trend) + '  HAD: ' + str(HAD_trend) + ' HA: ' + str(
+                                                    HA_trend) + ' HAH: ' + str(
+                                                    HAH_trend) + ' HC: ' + hour + ' 30mC: ' + thirtymin + ' 5mC: ' + fivemin + ' CS ' + str(
+                                                    candles_signal_short) + ' ' + str(
+                                                    candles_signal_long) + '  AI:' + str(
+                                                    ai_prediction(market)),
+                                                market))
+                                        cursor.execute(
+                                            'update orders set sell = 3 where active=1 and market =("%s")' % market)
+                                        cursor.execute(
+                                            "update orders set open_sell = %s, sell_time=%s  where market = %s and active =1",
+                                            (1, currtime, market))
+                                        newvalue = summ_serf() + serf * BTC_price
+                                        cursor.execute(
+                                            'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
+                                            currenttime, newvalue, market))
+                                        db.commit()
+                                    except MySQLdb.Error, e:
+                                        print "Error %d: %s" % (e.args[0], e.args[1])
+                                        sys.exit(1)
+                                    finally:
+                                        db.close()
 
 
 
 
-                            elif (active == 1) and (ai_prediction(market) != 'NEUTRAL' and ai_prediction(market) == 'DOWN') and newbid > bought_price_sql * ( 1 + profit/3) and currtime-ai_time_second<7200:  # #WAS profit2
+                            elif (ai_prediction(market) != 'NEUTRAL' and ai_prediction(market) == 'DOWN') and newbid > bought_price_sql * ( 1 + profit/3) and currtime-ai_time_second<7200 and last<hourcurrentopen:  # #WAS profit2
 
                                     # print ('22 - Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
-                                try:
-
-                                    printed = ('    10 -Selling ' + str(
-                                        format_float(
-                                            sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
-                                        format_float(newbid)) + '  and getting   ' + str(
-                                        format_float(serf*BTC_price)) + ' USD')
-                                    db = MySQLdb.connect("database-service", "cryptouser", "123456",
-                                                         "cryptodb")
-                                    cursor = db.cursor()
-                                    cursor.execute(
-                                        'insert into logs(date, log_entry) values("%s", "%s")' % (
-                                            currenttime, printed))
-                                    cursor.execute(
-                                        'update orders set reason_close =%s where active=1 and market =%s',
-                                        (
-                                            "10 AI SELL, price:  " + str(
-                                                format_float(newbid)) + "  time:   " + str(
-                                                currenttime), market))
-                                    cursor.execute(
-                                        'update orders set sell = 5 where active=1 and market =("%s")' % market)
-                                    cursor.execute(
-                                        "update orders set sell_time=%s  where market = %s and active =1",
-                                        (currtime, market))
-                                    cursor.execute(
-                                        'update orders set active = 0 where market =("%s")' % market)
-                                    newvalue=summ_serf()+serf
-                                    cursor.execute(
-                                        'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
-                                        currenttime, newvalue, market))
-                                    cursor.execute(
-                                        "update markets set strike_time= %s  where market = %s",
-                                        (currtime, market))
-                                    db.commit()
-                                except MySQLdb.Error, e:
-                                    print "Error %d: %s" % (e.args[0], e.args[1])
-                                    sys.exit(1)
-                                finally:
-                                    db.close()
+                                    try:
+                                        printed = ('    14  - Trying to sell ' + str(
+                                            format_float(
+                                                sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
+                                            format_float(newbid)) + '  and get  + ' + str(
+                                            format_float(serf * BTC_price)) + ' USD')
+                                        db = MySQLdb.connect("database-service", "cryptouser", "123456",
+                                                             "cryptodb")
+                                        cursor = db.cursor()
+                                        cursor.execute(
+                                            'insert into logs(date, log_entry) values("%s", "%s")' % (
+                                                currenttime, printed))
+                                        # cursor.execute('update orders set reason_close = "225 AI take profit" where active=1 and market =("%s")' % market)
+                                        cursor.execute(
+                                            'update orders set reason_close =%s where active=1 and market =%s',
+                                            (
+                                                "5 AI SELL, price:  " + str(
+                                                    format_float(newbid)) + "  time:   " + str(
+                                                    currenttime) +
+                                                '  BTC: ' + str(btc_trend) + '  HAD: ' + str(HAD_trend) + ' HA: ' + str(
+                                                    HA_trend) + ' HAH: ' + str(
+                                                    HAH_trend) + ' HC: ' + hour + ' 30mC: ' + thirtymin + ' 5mC: ' + fivemin + ' CS ' + str(
+                                                    candles_signal_short) + ' ' + str(candles_signal_long), market))
+                                        cursor.execute(
+                                            "update orders set open_sell = %s, sell_time=%s  where market = %s and active =1",
+                                            (1, currtime, market))
+                                        cursor.execute(
+                                            'update orders set sell = 5 where active=1 and market =("%s")' % market)
+                                        newvalue = summ_serf() + serf * BTC_price
+                                        cursor.execute(
+                                            'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
+                                            currenttime, newvalue, market))
+                                        cursor.execute(
+                                            "update markets set strike_time= %s  where market = %s",
+                                            (currtime, market))
+                                        db.commit()
+                                    except MySQLdb.Error, e:
+                                        print "Error %d: %s" % (e.args[0], e.args[1])
+                                        sys.exit(1)
+                                    finally:
+                                        db.close()
                                 #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed,"database-service")
 
 
@@ -535,93 +544,96 @@ def tick():
 
 
 
-                            elif (active == 1) and (newbid * bought_quantity_sql * (1 + profit/3) < (
-                                bought_price_sql * bought_quantity_sql)) and (sell_signal == 1 or  sell_signal == 2):  # #WAS profit2
+                            elif (max_percent_sql==0 and timestamp-timestamp_old> 1800 and fivemin=='D'):   # #WAS profit2
 
 
                                             # print ('Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
-                                try:
+                                     try:
+                                         printed = ('    144 - Trying to Sell ' + str(
+                                             format_float(
+                                                 sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
+                                             format_float(newbid)) + '  and lose   ' + str(
+                                             format_float(serf * BTC_price)) + ' USD')
+                                         db = MySQLdb.connect("database-service", "cryptouser", "123456",
+                                                              "cryptodb")
+                                         cursor = db.cursor()
+                                         cursor.execute(
+                                             'insert into logs(date, log_entry) values("%s", "%s")' % (
+                                                 currenttime, printed))
 
-                                    printed = ('   13 Selling ' + str(
-                                        format_float(
-                                            sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
-                                        format_float(newbid)) + '  and losing  ' + str(
-                                        format_float(serf*BTC_price)) + ' USD' )
-                                    db = MySQLdb.connect("database-service", "cryptouser", "123456",
-                                                         "cryptodb")
-                                    cursor = db.cursor()
-                                    cursor.execute(
-                                        'insert into logs(date, log_entry) values("%s", "%s")' % (
-                                            currenttime, printed))
-                                    cursor.execute(
-                                        'update orders set reason_close =%s where active=1 and market =%s',
-                                        ("13  small SL, p:   " + str(
-                                            format_float(newbid)) + " t:    " + str(currenttime), market))
-                                    cursor.execute(
-                                        "update orders set sell_time=%s  where market = %s and active =1",
-                                        (currtime, market))
-                                    cursor.execute(
-                                        'update orders set active = 0 where market =("%s")' % market)
-                                    newvalue = summ_serf() + serf
-                                    cursor.execute(
-                                        'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
-                                        currenttime, newvalue, market))
-                                    db.commit()
-                                except MySQLdb.Error, e:
-                                    print "Error %d: %s" % (e.args[0], e.args[1])
-                                    sys.exit(1)
-                                finally:
-                                    db.close()
+                                         cursor.execute(
+                                             'update orders set reason_close =%s where active=1 and market =%s',
+                                             (
+                                                 "144 Zero SL SELL, price:  " + str(
+                                                     format_float(newbid)) + "  time:   " + str(
+                                                     currenttime), market))
+
+                                         cursor.execute(
+                                             "update orders set open_sell = %s, sell_time=%s  where market = %s and active =1",
+                                             (1, currtime, market))
+                                         newvalue = summ_serf() + serf * BTC_price
+                                         cursor.execute(
+                                             'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
+                                             currenttime, newvalue, market))
+                                         db.commit()
+                                     except MySQLdb.Error, e:
+                                         print "Error %d: %s" % (e.args[0], e.args[1])
+                                         sys.exit(1)
+                                     finally:
+                                         db.close()
                                 #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed,"database-service")
 
-                            elif (active == 1) and serf>0  and (sell_signal == 1 or  sell_signal == 2) and procent_serf<0.4 and last<hourcurrentopen:   # #WAS profit2
+                            elif ((newbid * (1 + profit / 3) < (bought_price_sql )) or procent_serf==min_percent_sql) and (sell_signal != 0): # #WAS profit2
 
                                                 # print ('Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
-                                try:
-
-                                    printed = ('  14 Selling ' + str(
-                                        format_float(
-                                            sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
-                                        format_float(newbid)) + '  and getting  ' + str(
-                                        format_float(serf*BTC_price)) + ' USD'  )
-                                    db = MySQLdb.connect("database-service", "cryptouser", "123456",
-                                                         "cryptodb")
-                                    cursor = db.cursor()
-                                    cursor.execute(
-                                        'insert into logs(date, log_entry) values("%s", "%s")' % (
-                                            currenttime, printed))
-                                    cursor.execute(
-                                        'update orders set reason_close =%s where active=1 and market =%s',
-                                        (" 14  ha TP, p:   " + str(
-                                            format_float(newbid)) + " t:    " + str(currenttime), market))
-                                    cursor.execute(
-                                        "update orders set sell_time=%s  where market = %s and active =1",
-                                        (currtime, market))
-                                    cursor.execute(
-                                        'update orders set active = 0 where market =("%s")' % market)
-                                    newvalue = summ_serf() + serf
-                                    cursor.execute(
-                                        'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
-                                        currenttime, newvalue, market))
-                                    db.commit()
-                                except MySQLdb.Error, e:
-                                    print "Error %d: %s" % (e.args[0], e.args[1])
-                                    sys.exit(1)
-                                finally:
-                                    db.close()
+                                     try:
+                                         printed = ('   16  -Trying to Sell ' + str(
+                                             format_float(
+                                                 sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
+                                             format_float(newbid)) + '  and lose  ' + str(
+                                             format_float(serf * BTC_price)) + ' USD')
+                                         db = MySQLdb.connect("database-service", "cryptouser", "123456",
+                                                              "cryptodb")
+                                         cursor = db.cursor()
+                                         cursor.execute(
+                                             'insert into logs(date, log_entry) values("%s", "%s")' % (
+                                                 currenttime, printed))
+                                         cursor.execute(
+                                             'update orders set reason_close =%s where active=1 and market =%s',
+                                             ("13 small SL, p:   " + str(
+                                                 format_float(newbid)) + " t:    " + str(currenttime) +
+                                              '  BTC: ' + str(btc_trend) + '  HAD: ' + str(
+                                                 HAD_trend) + ' HA: ' + str(
+                                                 HA_trend) + ' HAH: ' + str(HAH_trend) + ' HC: ' + str(
+                                                 hour) + ' 30mC: ' + str(thirtymin) + ' 5mC: ' + str(
+                                                 fivemin) + ' CS ' + str(candles_signal_short) + ' ' + str(
+                                                 candles_signal_long) + '  AI:' + str(
+                                                 ai_prediction(market)), market))
+                                         cursor.execute(
+                                             "update orders set open_sell = %s, sell_time=%s  where market = %s and active =1",
+                                             (1, currtime, market))
+                                         newvalue = summ_serf() + serf * BTC_price
+                                         cursor.execute(
+                                             'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
+                                             currenttime, newvalue, market))
+                                         db.commit()
+                                     except MySQLdb.Error, e:
+                                         print "Error %d: %s" % (e.args[0], e.args[1])
+                                         sys.exit(1)
+                                     finally:
+                                         db.close()
                                 #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed, "database-service")
 
 
-                            elif serf>0 and max_percent_sql-procent_serf>=0.5 and max_percent_sql>=2 and  last<currentopen and last<hourcurrentopen and hourprevopen>hourprevclose:  # # WAS profit2
+                            elif serf_usd >= 0 and procent_serf<0.4 and (sell_signal != 0) and last<hourcurrentopen:   # # WAS profit2
 
                                     # print ('22 - Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
                                     try:
-
-                                        printed = ('    88 -Selling ' + str(
+                                        printed = ('  18  - Trying to Sell ' + str(
                                             format_float(
                                                 sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
-                                            format_float(newbid)) + '  and getting   ' + str(
-                                            format_float(serf)) + ' USD')
+                                            format_float(newbid)) + '  and get + ' + str(
+                                            format_float(serf * BTC_price)) + ' USD')
                                         db = MySQLdb.connect("database-service", "cryptouser", "123456",
                                                              "cryptodb")
                                         cursor = db.cursor()
@@ -630,18 +642,19 @@ def tick():
                                                 currenttime, printed))
                                         cursor.execute(
                                             'update orders set reason_close =%s where active=1 and market =%s',
-                                            (
-                                                "88  TP-SL SELL, p:   " + str(
-                                                    format_float(newbid)) + "   t:    " + str(currenttime),
-                                                market))
+                                            ("14  ha TP, p:   " + str(
+                                                format_float(newbid)) + " t:    " + str(currenttime) +
+                                             '  BTC: ' + str(btc_trend) + '  HAD: ' + str(HAD_trend) + ' HA: ' + str(
+                                                HA_trend) + ' HAH: ' + str(HAH_trend) + ' HC: ' + str(
+                                                hour) + ' 30mC: ' + str(thirtymin) + ' 5mC: ' + str(
+                                                fivemin) + ' CS ' + str(candles_signal_short) + ' ' + str(
+                                                candles_signal_long) + '  AI:' + str(
+                                                ai_prediction(market)), market))
+
                                         cursor.execute(
-                                            'update orders set sell = 4 where active=1 and market =("%s")' % market)
-                                        cursor.execute(
-                                            "update orders set sell_time=%s  where market = %s and active =1",
-                                            (currtime, market))
-                                        cursor.execute(
-                                            'update orders set active = 0 where market =("%s")' % market)
-                                        newvalue = summ_serf() + serf
+                                            "update orders set open_sell = %s, sell_time=%s  where market = %s and active =1",
+                                            (1, currtime, market))
+                                        newvalue = summ_serf() + serf * BTC_price
                                         cursor.execute(
                                             'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
                                             currenttime, newvalue, market))
@@ -653,83 +666,86 @@ def tick():
                                         db.close()
                                     #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed, "database-service")
 
-#                            elif (active == 1) and serf > 0 and percent_chg<0:  # #WAS profit2
-
-                                        # print ('Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
-#                                        try:
-
-#                                            printed = ('  141 Selling ' + str(
-#                                               format_float(
-#                                                    sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
-#                                                format_float(newbid)) + '  and getting  ' + str(
-#                                                format_float(serf)) + ' USD')
-#                                            db = MySQLdb.connect("database-service", "cryptouser", "123456",
-#                                                                 "cryptodb")
-#                                            cursor = db.cursor()
-#                                            cursor.execute(
-#                                                'insert into logs(date, log_entry) values("%s", "%s")' % (
-#                                                    currenttime, printed))
-#                                            cursor.execute(
-#                                                'update orders set reason_close =%s where active=1 and market =%s',
-#                                                (" 141  percent TP, p:   " + str(
-#                                                    format_float(newbid)) + " t:    " + str(currenttime), market))
-#                                            cursor.execute(
-#                                                'update orders set active = 0 where market =("%s")' % market)
-#                                            newvalue = summ_serf() + serf
-#                                            cursor.execute(
-#                                                'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
-#                                                    currenttime, newvalue, market))
-#                                            db.commit()
-#                                        except MySQLdb.Error, e:
-#                                            print "Error %d: %s" % (e.args[0], e.args[1])
-#                                            sys.exit(1)
-#                                        finally:
-#                                            db.close()
-
-
 
 
  ## AI_HA MODE SL
-                            elif (active == 1) and (newbid * bought_quantity_sql * (1 + parameters()[3]) < (
-                                bought_price_sql * bought_quantity_sql)):  # #WAS profit2
+                            elif (sell_signal == 7):  # #WAS profit2
 
 
                                     # print ('Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
-                                try:
+                                    try:
+                                        printed = ('  20 - Trying to Sell ' + str(
+                                            format_float(
+                                                sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
+                                            format_float(newbid)) + '  and get or lose  ' + str(
+                                            format_float(serf * BTC_price)) + ' USD')
+                                        db = MySQLdb.connect("database-service", "cryptouser", "123456",
+                                                             "cryptodb")
+                                        cursor = db.cursor()
+                                        cursor.execute(
+                                            'insert into logs(date, log_entry) values("%s", "%s")' % (
+                                                currenttime, printed))
+                                        cursor.execute(
+                                            'update orders set reason_close =%s where active=1 and market =%s',
+                                            ("7  BTC SL, p:   " + str(
+                                                format_float(newbid)) + " t:    " + str(currenttime) +
+                                             '  BTC: ' + str(btc_trend) + '  HAD: ' + str(HAD_trend) + ' HA: ' + str(
+                                                HA_trend) + ' HAH: ' + str(HAH_trend) + ' HC: ' + str(
+                                                hour) + ' 30mC: ' + str(thirtymin) + ' 5mC: ' + str(
+                                                fivemin) + ' CS ' + str(candles_signal_short) + ' ' + str(
+                                                candles_signal_long) + '  AI:' + str(
+                                                ai_prediction(market)), market))
 
-                                    printed = ('  15 Selling ' + str(
-                                        format_float(
-                                            sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
-                                        format_float(newbid)) + '  and losing  ' + str(
-                                        format_float(serf*BTC_price)) + ' USD' )
-                                    db = MySQLdb.connect("database-service", "cryptouser", "123456",
-                                                         "cryptodb")
-                                    cursor = db.cursor()
-                                    cursor.execute(
-                                        'insert into logs(date, log_entry) values("%s", "%s")' % (
-                                            currenttime, printed))
-                                    cursor.execute(
-                                        'update orders set reason_close =%s where active=1 and market =%s',
-                                        (" 15  SL, p:   " + str(
-                                            format_float(newbid)) + " t:    " + str(currenttime), market))
-                                    cursor.execute(
-                                        'update orders set sell = 6 where active=1 and market =("%s")' % market)
-                                    cursor.execute(
-                                        "update orders set sell_time=%s  where market = %s and active =1",
-                                        (currtime, market))
-                                    cursor.execute(
-                                        'update orders set active = 0 where market =("%s")' % market)
-                                    newvalue=summ_serf()+serf
-                                    cursor.execute(
-                                        'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
-                                        currenttime, newvalue, market))
-                                    db.commit()
-                                except MySQLdb.Error, e:
-                                    print "Error %d: %s" % (e.args[0], e.args[1])
-                                    sys.exit(1)
-                                finally:
-                                    db.close()
+                                        cursor.execute(
+                                            "update orders set open_sell = %s, sell_time=%s  where market = %s and active =1",
+                                            (1, currtime, market))
+                                        newvalue = summ_serf() + serf * BTC_price
+                                        cursor.execute(
+                                            'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
+                                            currenttime, newvalue, market))
+                                        db.commit()
+                                    except MySQLdb.Error, e:
+                                        print "Error %d: %s" % (e.args[0], e.args[1])
+                                        sys.exit(1)
+                                    finally:
+                                        db.close()
                                 #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed, "database-service")
+
+                            elif (newbid * bought_quantity_sql * (1 + profit) < (bought_price_sql * bought_quantity_sql)): # #WAS profit2
+
+                                        # print ('Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
+                                        try:
+                                            printed = ('  22 Prod - Trying to sell ' + str(
+                                                format_float(
+                                                    sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
+                                                format_float(newbid)) + '  and lose  ' + str(
+                                                format_float(serf * BTC_price)) + ' USD')
+                                            db = MySQLdb.connect("database-service", "cryptouser", "123456",
+                                                                 "cryptodb")
+                                            cursor = db.cursor()
+                                            cursor.execute(
+                                                'insert into logs(date, log_entry) values("%s", "%s")' % (
+                                                    currenttime, printed))
+                                            cursor.execute(
+                                                'update orders set reason_close =%s where active=1 and market =%s',
+                                                (" 22  SL, p:   " + str(
+                                                    format_float(newbid)) + " t:    " + str(currenttime) +
+                                        '  BTC: ' + str(btc_trend) + '  HAD: ' + str(HAD_trend) + ' HA: ' + str(
+                                            HA_trend) + ' HAH: ' + str(HAH_trend)  + ' HC: ' + str(hour) + ' 30mC: ' + str(thirtymin) + ' 5mC: ' + str(fivemin)+' CS '+str(candles_signal_short) +' '+str(candles_signal_long) + '  AI:'  + str(
+                                        ai_prediction(market)), market))
+                                            cursor.execute(
+                                                "update orders set open_sell = %s, sell_time=%s  where market = %s and active =1",
+                                                (1, currtime, market))
+                                            newvalue = summ_serf() + serf * BTC_price
+                                            cursor.execute(
+                                                'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
+                                                currenttime, newvalue, market))
+                                            db.commit()
+                                        except MySQLdb.Error, e:
+                                            print "Error %d: %s" % (e.args[0], e.args[1])
+                                            sys.exit(1)
+                                        finally:
+                                            db.close()
 
                             else:
 
