@@ -187,6 +187,7 @@ def tick():
 
 
 
+
 #FIRST ITERATION - BUY
                 #spread=((ask/bid)-1)*100
                 print "Strarting buying mechanizm for " , market
