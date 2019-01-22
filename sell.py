@@ -18,7 +18,7 @@ TICK_INTERVAL = 60  # seconds
 
 #The main function
 def main():
-    print('Starting trader bot')
+    print('Starting sell module')
 
     # Running clock forever
     while True:
@@ -41,7 +41,8 @@ def tick():
     btc_trend = parameters()[12]
     current_order_count = order_count()
     debug_mode=parameters()[10]
-    #print c.get_market_summaries().json()['result']
+    print "Global sell parameters configured, moving to market loop"
+
 
 
     #global active
@@ -137,7 +138,7 @@ def tick():
                 else:
                     hour='D'
 
-
+                print "Market prameters configured, moving to selling for ", market
 
                 try:
                     db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
@@ -178,10 +179,11 @@ def tick():
                 max_percent_sql = float("{0:.2f}".format(status_orders(market, 15)))
                 min_percent_sql = float("{0:.2f}".format(status_orders(market, 24)))
                 #print market, procent_serf
+                print "Updated sell serf and procent serf stuff for", market
 
 # Force Stop
                 if stop_bot_force==1:
-
+                        print ('    33 -Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(newbid)) + '  and getting or loosing  ' + str(format_float(serf * BTC_price)) + ' USD')
                         # print ('22 - Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
                         try:
                             printed = ('    33 -Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(newbid)) + '  and getting or loosing  ' + str(format_float(serf*BTC_price)) + ' USD')
@@ -221,6 +223,7 @@ def tick():
 
 
 # AI_HA MODE SELL START
+                print "Strarting selling mechanizm for ", market
                 if bought_price_sql != None:
                     if bought_quantity_sql is None or bought_quantity_sql == 0.0:
                         # print market, bought_quantity_sql, current_balance
@@ -232,6 +235,12 @@ def tick():
 
                         if ((serf_usd > 0 and max_percent_sql - procent_serf >= 0.2 and 1.5>=max_percent_sql >= 1.0 and fivemin=='D') or (serf_usd > 0 and max_percent_sql - procent_serf >= 0.1 and 1.0>=max_percent_sql >= 0.7 )  or (serf_usd > 0 and max_percent_sql - procent_serf >= 0.5 and 2.0>=max_percent_sql >= 1.5 and fivemin=='D') or (serf_usd > 0 and max_percent_sql - procent_serf >= 1.0 and 3.0>=max_percent_sql >= 2.0 and fivemin=='D') or max_percent_sql>7.0 and slow_market==1)\
                                     or  ((serf_usd > 0 and max_percent_sql - procent_serf >= 0.2 and 1.5>=max_percent_sql >= 0.8) or (serf_usd > 0 and max_percent_sql - procent_serf >= 1.5 and 3.0>=max_percent_sql >= 2.0 and fivemin=='D') or max_percent_sql>10.0  and slow_market==0):
+                            print ('   6 -Selling ' + str(format_float(
+                                sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
+                                format_float(newbid)) + '  and getting  +' + str(format_float(
+                                ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' + ' or ' + str(
+                                format_float((
+                                                 newbid * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
                             try:
                                 printed = ('   6 -Selling ' + str(format_float(
                                     sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
@@ -319,7 +328,11 @@ def tick():
                         else:
 
                             if  (serf_usd > 0 and max_percent_sql - procent_serf >= 1.0 and max_percent_sql >= 3.0 and slow_market==1) or (serf_usd > 0 and max_percent_sql - procent_serf >= 1.5 and max_percent_sql >= 3.0 and slow_market==0):    # # WAS profit2
-
+                                print ('    10  - Trying to Sell ' + str(
+                                    format_float(
+                                        sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
+                                    format_float(ask)) + '  and get  + ' + str(
+                                    format_float(serf * BTC_price)) + ' USD')
                                 try:
                                     printed = ('    10  - Trying to Sell ' + str(
                                         format_float(
@@ -369,7 +382,12 @@ def tick():
 
 
                             if serf_usd<0 and max_percent_sql<=0.5 and procent_serf==min_percent_sql and  timestamp - timestamp_old > 7200:
-
+                                    print ('  12 -Selling ' + str(format_float(
+                                    sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
+                                    format_float(newbid)) + '  and losing  ' + str(format_float(
+                                    ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' + ' or ' + str(
+                                    format_float((
+                                                     newbid * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
                                     # print ('22 - Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
                                     try:
                                         printed = ('  12 -Selling ' + str(format_float(
@@ -414,7 +432,11 @@ def tick():
 
 
                             elif (ai_prediction(market) != 'NEUTRAL' and ai_prediction(market) == 'DOWN') and newbid > bought_price_sql * ( 1 + profit/3) and currtime-ai_time_second<7200 and last<hourcurrentopen:  # #WAS profit2
-
+                                    print ('    14  - Trying to sell ' + str(
+                                    format_float(
+                                        sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
+                                    format_float(newbid)) + '  and get  + ' + str(
+                                    format_float(serf * BTC_price)) + ' USD')
                                     # print ('22 - Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
                                     try:
                                         printed = ('    14  - Trying to sell ' + str(
@@ -541,14 +563,15 @@ def tick():
 
 
 
-
-
-
                             elif (max_percent_sql==0 and timestamp-timestamp_old> 1800 and fivemin=='D'):   # #WAS profit2
 
-
+                                    print ('    144 - Trying to Sell ' + str(
+                                    format_float(
+                                        sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
+                                    format_float(newbid)) + '  and lose   ' + str(
+                                    format_float(serf * BTC_price)) + ' USD')
                                             # print ('Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
-                                     try:
+                                    try:
                                          printed = ('    144 - Trying to Sell ' + str(
                                              format_float(
                                                  sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
@@ -576,16 +599,17 @@ def tick():
                                              'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
                                              currenttime, newvalue, market))
                                          db.commit()
-                                     except MySQLdb.Error, e:
+                                    except MySQLdb.Error, e:
                                          print "Error %d: %s" % (e.args[0], e.args[1])
                                          sys.exit(1)
-                                     finally:
+                                    finally:
                                          db.close()
                                 #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed,"database-service")
 
                             elif ((newbid * (1 + profit / 3) < (bought_price_sql )) or procent_serf==min_percent_sql) and (sell_signal != 0): # #WAS profit2
 
-                                                # print ('Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
+                                     print ('   16  -Trying to Sell ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(newbid)) + '  and lose  ' + str(format_float(serf * BTC_price)) + ' USD')
+                                # print ('Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
                                      try:
                                          printed = ('   16  -Trying to Sell ' + str(
                                              format_float(
@@ -626,7 +650,11 @@ def tick():
 
 
                             elif serf_usd >= 0 and procent_serf<0.4 and (sell_signal != 0) and last<hourcurrentopen:   # # WAS profit2
-
+                                    print ('  18  - Trying to Sell ' + str(
+                                    format_float(
+                                        sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
+                                    format_float(newbid)) + '  and get + ' + str(
+                                    format_float(serf * BTC_price)) + ' USD')
                                     # print ('22 - Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
                                     try:
                                         printed = ('  18  - Trying to Sell ' + str(
@@ -670,7 +698,11 @@ def tick():
 
  ## AI_HA MODE SL
                             elif (sell_signal == 7):  # #WAS profit2
-
+                                    print ('  20 - Trying to Sell ' + str(
+                                    format_float(
+                                        sell_quantity_sql)) + ' units of ' + market + ' for ' + str(
+                                    format_float(newbid)) + '  and get or lose  ' + str(
+                                    format_float(serf * BTC_price)) + ' USD')
 
                                     # print ('Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
                                     try:
@@ -712,7 +744,7 @@ def tick():
                                 #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed, "database-service")
 
                             elif (newbid * bought_quantity_sql * (1 + profit) < (bought_price_sql * bought_quantity_sql)): # #WAS profit2
-
+                                        print ('  22 Prod - Trying to sell ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(newbid)) + '  and lose  ' + str(format_float(serf * BTC_price)) + ' USD')
                                         # print ('Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
                                         try:
                                             printed = ('  22 Prod - Trying to sell ' + str(

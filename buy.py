@@ -14,7 +14,7 @@ c=Client(api_key="", api_secret="")
 
 #The main function
 def main():
-    print('Starting trader bot')
+    print('Starting buy module')
     tick()
 
 ################################################################################################################
@@ -29,7 +29,7 @@ def tick():
     btc_trend = parameters()[12]
     debug_mode=parameters()[10]
     max_orders = parameters()[5]
-    #print c.get_market_summaries().json()['result']
+    print "Global buy parameters configured, moving to market loop"
 
 
     #global active
@@ -143,7 +143,7 @@ def tick():
 
 
 
-                print market
+                print "Market prameters configured, moving to buy for ", market
 
 
                 try:
@@ -180,7 +180,7 @@ def tick():
                     ########
 
                 max_percent_sql = status_orders(market, 15)
-                #print market, procent_serf
+                print "Updated serf and procent serf stuff for" , market
 
 
 
@@ -189,7 +189,7 @@ def tick():
 
 #FIRST ITERATION - BUY
                 #spread=((ask/bid)-1)*100
-                #print market, spread
+                print "Strarting buying mechanizm for " , market
 
                 if ((stop_bot == 0) and (HA_trend == "UP" or HA_trend == "Revers-UP" or HA_trend == "STABLE") and (
                                 HAD_trend == "UP" or HAD_trend == "Revers-UP" or HAD_trend == "STABLE") and (HAH_trend == "UP" or HAH_trend == "Revers-UP") and stop_bot_force == 0) and (
@@ -199,7 +199,8 @@ def tick():
 
                         # If we have some currency on the balance
                         if bought_quantity_sql !=0.0:
-                            # print('We already have ' + str(format_float(current_balance)) + ' units of  ' + market + ' on our balance')
+                            print ('    2 - We already have ' + str(
+                                    format_float(bought_quantity_sql)) + '  ' + market + ' on our balance')
                             try:
                                 printed = ('    2 - We already have ' + str(
                                     format_float(bought_quantity_sql)) + '  ' + market + ' on our balance')
@@ -215,7 +216,7 @@ def tick():
                                 db.close()
                         # if we have some active orders in sql
                         elif active == 1 and iteration != 0:
-                            # print ('We already have ' + str(float(status_orders(market, 2))) + ' units of ' + market + ' on our balance')
+                            print  ('    3 - We already have ' + str(float(status_orders(market, 2))) + ' units of ' + market + ' on our balance')
                             try:
                                 printed = ('    3 - We already have ' + str(
                                     float(status_orders(market, 2))) + ' units of ' + market + ' on our balance')
@@ -232,6 +233,7 @@ def tick():
                         else:
                             # Buy some currency by market analize first time
                             try:
+                                print ('    4- Purchasing (by ai_ha) '  + str(format_float(buy_quantity)) + ' units of ' + market + ' for ' + str(format_float(newask)))
                                 printed = ('    4- Purchasing (by ai_ha) '  + str(
                                     format_float(buy_quantity)) + ' units of ' + market + ' for ' + str(
                                     format_float(newask)))
