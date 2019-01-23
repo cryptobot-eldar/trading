@@ -576,7 +576,7 @@ def tick():
 
 
 
-                            elif (max_percent_sql==0 and timestamp-timestamp_old> 1800 and fivemin=='D'):   # #WAS profit2
+                            elif (max_percent_sql==0 and timestamp-timestamp_old> 3600 and fivemin=='D'):   # #WAS profit2
 
                                     print ('    144 - Trying to Sell ' + str(
                                     format_float(
