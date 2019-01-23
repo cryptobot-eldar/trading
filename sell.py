@@ -602,7 +602,11 @@ def tick():
                                              (
                                                  "144 Zero SL SELL, price:  " + str(
                                                      format_float(newbid)) + "  time:   " + str(
-                                                     currenttime), market))
+                                                     currenttime)+
+                                                '  BTC: ' + str(btc_trend) + '  HAD: ' + str(HAD_trend) + ' HA: ' + str(
+                                                    HA_trend) + ' HAH: ' + str(
+                                                    HAH_trend) + ' HC: ' + hour + ' 30mC: ' + thirtymin + ' 5mC: ' + fivemin + ' CS ' + str(
+                                                    candles_signal_short) + ' ' + str(candles_signal_long), market))
                                          cursor.execute(
                                              'update orders set active = 0 where market =("%s")' % market)
                                          newvalue = summ_serf() + serf * BTC_price
