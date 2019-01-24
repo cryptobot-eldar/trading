@@ -190,10 +190,10 @@ def tick():
 
 #FIRST ITERATION - BUY
                 #spread=((ask/bid)-1)*100
-                print "Strarting buying mechanizm for " , market
+                print "Starting buying mechanizm for " , market
 
                 if ((stop_bot == 0) and (HA_trend == "UP" or HA_trend == "Revers-UP" or HA_trend == "STABLE") and (
-                                HAD_trend == "UP" or HAD_trend == "Revers-UP" or HAD_trend == "STABLE") and (HAH_trend == "UP" or HAH_trend == "Revers-UP") and stop_bot_force == 0) and (
+                                HAD_trend == "UP" or HAD_trend == "Revers-UP" or HAD_trend == "STABLE") and (HAH_trend == "UP" or HAH_trend == "Revers-UP" or HAH_trend == "STABLE") and stop_bot_force == 0) and (
                             currtime - ha_time_second < 2000) and (currtime - strike_time > 36000)  and current_order_count<=max_orders and last>fivehourcurrentopen and fivehourprevopen<fivehourprevclose and last>currentopen: # and fivemin!='D' and hour!='D' and percent_sql>0.0 and candles_status!='DOWN' and (currtime - strike_time2 > 36000):
                         #balance_res = get_balance_from_market(market)
                         #current_balance = balance_res['result']['Available']
