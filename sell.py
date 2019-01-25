@@ -144,7 +144,7 @@ def tick():
                     db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
                     cursor = db.cursor()
 
-                    serf = (newbid * bought_quantity_sql - bought_price_sql * bought_quantity_sql)
+                    serf = float("{0:.8f}".format(newbid * bought_quantity_sql - bought_price_sql * bought_quantity_sql))
                     serf_usd = float("{0:.4f}".format(serf * BTC_price))
                     if bought_price_sql!=0:
 
@@ -166,7 +166,7 @@ def tick():
                     cursor.execute("update orders set serf_usd = %s where market = %s and active =1", (serf*BTC_price, market))
                     cursor.execute(
                         "update markets set current_price = %s  where market = %s and active =1",
-                        (last, market))
+                        (newbid, market))
                     db.commit()
                 except MySQLdb.Error, e:
                     print "Error %d: %s" % (e.args[0], e.args[1])
@@ -365,7 +365,7 @@ def tick():
                                         'update orders set reason_close =%s where active=1 and market =%s',
                                         (
                                             "6 Good TP SELL, price:  " + str(
-                                                format_float(last)) + "  time:   " + str(
+                                                format_float(newbid)) + "  time:   " + str(
                                                 currenttime) +
                                             '  BTC: ' + str(btc_trend) + '  HAD: ' + str(HAD_trend) + ' HA: ' + str(
                                                 HA_trend) + ' HAH: ' + str(HAH_trend) + ' HC: ' + str(
