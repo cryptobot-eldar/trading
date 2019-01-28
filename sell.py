@@ -209,7 +209,7 @@ def tick():
                                 db = MySQLdb.connect("database-service", "cryptouser", "123456", "cryptodb")
                                 cursor = db.cursor()
                                 cursor.execute('insert into logs(date, log_entry) values("%s", "%s")' % (currenttime, printed))
-                                cursor.execute('update orders set reason_close =%s where active=1 and market =%s', ("33 , Force_stop_bot p:    " + str(format_float(newbid)) + "    t:   " + str(currenttime),market))
+                                cursor.execute('update orders set reason_close =%s, sell_time=%s where active=1 and market =%s', ("33 , Force_stop_bot p:    " + str(format_float(newbid)) + "    t:   " + str(currenttime),currtime, market))
                                 cursor.execute('update orders set active = 0 where market =("%s")' % market)
                                 db.commit()
                             except MySQLdb.Error, e:
@@ -273,14 +273,14 @@ def tick():
                                         currenttime, printed))
                                     # cursor.execute('update orders set active = 0, reason_close = "12 Take profit" where market =("%s")' % market)
                                     cursor.execute(
-                                        'update orders set reason_close =%s where active=1 and market =%s', (
+                                        'update orders set reason_close =%s, sell_time=%s  where active=1 and market =%s', (
                                             "4  TP , price:    " + str(
                                                 format_float(newbid)) + "    time:   " + str(currenttime) +
                                             '  BTC: ' + str(btc_trend) + '  HAD: ' + str(HAD_trend) + ' HA: ' + str(
                                                 HA_trend) + ' HAH: ' + str(HAH_trend) + ' HC: ' + str(
                                                 hour) + ' 30mC: ' + str(thirtymin) + ' 5mC: ' + str(fivemin) + ' CS ' + str(
                                                 candles_signal_short) + ' ' + str(candles_signal_long) + '  AI:' + str(
-                                                ai_prediction(market)),
+                                                ai_prediction(market)),currtime,
                                             market))
                                     if sell_signal == 0:
                                         cursor.execute(
@@ -365,7 +365,7 @@ def tick():
                                                 currenttime, printed))
                                         # cursor.execute('update orders set reason_close = "225 AI take profit" where active=1 and market =("%s")' % market)
                                         cursor.execute(
-                                            'update orders set reason_close =%s where active=1 and market =%s',
+                                            'update orders set reason_close =%s, sell_time=%s  where active=1 and market =%s',
                                             (
                                                 "6 Good TP SELL, price:  " + str(
                                                     format_float(newbid)) + "  time:   " + str(
@@ -375,7 +375,7 @@ def tick():
                                                     hour) + ' 30mC: ' + str(thirtymin) + ' 5mC: ' + str(
                                                     fivemin) + ' CS ' + str(candles_signal_short) + ' ' + str(
                                                     candles_signal_long) + '  AI:' + str(
-                                                    ai_prediction(market)), market))
+                                                    ai_prediction(market)), currtime, market))
                                         cursor.execute(
                                             'update orders set sell = 6 where active=1 and market =("%s")' % market)
                                         if max_percent_sql > profit / 1.5:
@@ -419,7 +419,7 @@ def tick():
                                                 currenttime, printed))
                                             # cursor.execute('update orders set active = 0, reason_close = "12 Take profit" where market =("%s")' % market)
                                             cursor.execute(
-                                                'update orders set reason_close =%s where active=1 and market =%s', (
+                                                'update orders set reason_close =%s, sell_time=%s  where active=1 and market =%s', (
                                                     "3  fast SL, price:    " + str(
                                                         format_float(newbid)) + "    time:   " + str(currenttime) +
                                                     '  BTC: ' + str(btc_trend) + '  HAD: ' + str(HAD_trend) + ' HA: ' + str(
@@ -427,7 +427,7 @@ def tick():
                                                         HAH_trend) + ' HC: ' + hour + ' 30mC: ' + thirtymin + ' 5mC: ' + fivemin + ' CS ' + str(
                                                         candles_signal_short) + ' ' + str(
                                                         candles_signal_long) + '  AI:' + str(
-                                                        ai_prediction(market)),
+                                                        ai_prediction(market)), currtime,
                                                     market))
                                             cursor.execute(
                                                 'update orders set sell = 3 where active=1 and market =("%s")' % market)
@@ -468,7 +468,7 @@ def tick():
                                                     currenttime, printed))
                                             # cursor.execute('update orders set reason_close = "225 AI take profit" where active=1 and market =("%s")' % market)
                                             cursor.execute(
-                                                'update orders set reason_close =%s where active=1 and market =%s',
+                                                'update orders set reason_close =%s, sell_time=%s  where active=1 and market =%s',
                                                 (
                                                     "5 AI SELL, price:  " + str(
                                                         format_float(newbid)) + "  time:   " + str(
@@ -476,7 +476,7 @@ def tick():
                                                     '  BTC: ' + str(btc_trend) + '  HAD: ' + str(HAD_trend) + ' HA: ' + str(
                                                         HA_trend) + ' HAH: ' + str(
                                                         HAH_trend) + ' HC: ' + hour + ' 30mC: ' + thirtymin + ' 5mC: ' + fivemin + ' CS ' + str(
-                                                        candles_signal_short) + ' ' + str(candles_signal_long), market))
+                                                        candles_signal_short) + ' ' + str(candles_signal_long),currtime, market))
 
                                             cursor.execute(
                                                 'update orders set sell = 5 where active=1 and market =("%s")' % market)
@@ -641,7 +641,7 @@ def tick():
                                                  'insert into logs(date, log_entry) values("%s", "%s")' % (
                                                      currenttime, printed))
                                              cursor.execute(
-                                                 'update orders set reason_close =%s where active=1 and market =%s',
+                                                 'update orders set reason_close =%s, sell_time=%s  where active=1 and market =%s',
                                                  ("13 small SL, p:   " + str(
                                                      format_float(newbid)) + " t:    " + str(currenttime) +
                                                   '  BTC: ' + str(btc_trend) + '  HAD: ' + str(
@@ -650,7 +650,7 @@ def tick():
                                                      hour) + ' 30mC: ' + str(thirtymin) + ' 5mC: ' + str(
                                                      fivemin) + ' CS ' + str(candles_signal_short) + ' ' + str(
                                                      candles_signal_long) + '  AI:' + str(
-                                                     ai_prediction(market)), market))
+                                                     ai_prediction(market)),currtime, market))
                                              cursor.execute(
                                                  'update orders set active = 0 where market =("%s")' % market)
                                              newvalue = summ_serf() + serf * BTC_price
@@ -686,7 +686,7 @@ def tick():
                                                 'insert into logs(date, log_entry) values("%s", "%s")' % (
                                                     currenttime, printed))
                                             cursor.execute(
-                                                'update orders set reason_close =%s where active=1 and market =%s',
+                                                'update orders set reason_close =%s, sell_time=%s  where active=1 and market =%s',
                                                 ("14  ha TP, p:   " + str(
                                                     format_float(newbid)) + " t:    " + str(currenttime) +
                                                  '  BTC: ' + str(btc_trend) + '  HAD: ' + str(HAD_trend) + ' HA: ' + str(
@@ -694,7 +694,7 @@ def tick():
                                                     hour) + ' 30mC: ' + str(thirtymin) + ' 5mC: ' + str(
                                                     fivemin) + ' CS ' + str(candles_signal_short) + ' ' + str(
                                                     candles_signal_long) + '  AI:' + str(
-                                                    ai_prediction(market)), market))
+                                                    ai_prediction(market)),currtime, market))
 
                                             cursor.execute(
                                                 'update orders set active = 0 where market =("%s")' % market)
@@ -734,7 +734,7 @@ def tick():
                                                 'insert into logs(date, log_entry) values("%s", "%s")' % (
                                                     currenttime, printed))
                                             cursor.execute(
-                                                'update orders set reason_close =%s where active=1 and market =%s',
+                                                'update orders set reason_close =%s, sell_time=%s  where active=1 and market =%s',
                                                 ("7  BTC SL, p:   " + str(
                                                     format_float(newbid)) + " t:    " + str(currenttime) +
                                                  '  BTC: ' + str(btc_trend) + '  HAD: ' + str(HAD_trend) + ' HA: ' + str(
@@ -742,7 +742,7 @@ def tick():
                                                     hour) + ' 30mC: ' + str(thirtymin) + ' 5mC: ' + str(
                                                     fivemin) + ' CS ' + str(candles_signal_short) + ' ' + str(
                                                     candles_signal_long) + '  AI:' + str(
-                                                    ai_prediction(market)), market))
+                                                    ai_prediction(market)),currtime, market))
 
                                             cursor.execute(
                                                 'update orders set active = 0 where market =("%s")' % market)
@@ -774,12 +774,12 @@ def tick():
                                                     'insert into logs(date, log_entry) values("%s", "%s")' % (
                                                         currenttime, printed))
                                                 cursor.execute(
-                                                    'update orders set reason_close =%s where active=1 and market =%s',
+                                                    'update orders set reason_close =%s, sell_time=%s  where active=1 and market =%s',
                                                     (" 22  SL, p:   " + str(
                                                         format_float(newbid)) + " t:    " + str(currenttime) +
                                             '  BTC: ' + str(btc_trend) + '  HAD: ' + str(HAD_trend) + ' HA: ' + str(
                                                 HA_trend) + ' HAH: ' + str(HAH_trend)  + ' HC: ' + str(hour) + ' 30mC: ' + str(thirtymin) + ' 5mC: ' + str(fivemin)+' CS '+str(candles_signal_short) +' '+str(candles_signal_long) + '  AI:'  + str(
-                                            ai_prediction(market)), market))
+                                            ai_prediction(market)),currtime, market))
                                                 cursor.execute(
                                                     'update orders set active = 0 where market =("%s")' % market)
                                                 newvalue = summ_serf() + serf * BTC_price

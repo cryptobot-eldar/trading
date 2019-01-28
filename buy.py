@@ -167,7 +167,7 @@ def tick():
                         cursor.execute("update orders set serf_usd = %s where market = %s and active =1", (serf*BTC_price, market))
                         cursor.execute(
                             "update markets set current_price = %s  where market = %s and active =1",
-                            (last, market))
+                            (newbid, market))
                         db.commit()
                     except MySQLdb.Error, e:
                         print "Error %d: %s" % (e.args[0], e.args[1])
