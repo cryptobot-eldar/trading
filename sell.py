@@ -291,7 +291,7 @@ def tick():
                                             (currtime, market))
                                     cursor.execute(
                                         'update orders set active = 0 where market =("%s")' % market)
-                                    newvalue = summ_serf() + serf * BTC_price
+                                    newvalue = summ_serf() + procent_serf
                                     cursor.execute('insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (currenttime, newvalue, market))
                                     db.commit()
                                 except MySQLdb.Error, e:
@@ -384,7 +384,7 @@ def tick():
                                                 (currtime, market))
                                         cursor.execute(
                                             'update orders set active = 0 where market =("%s")' % market)
-                                        newvalue = summ_serf() + serf * BTC_price
+                                        newvalue = summ_serf() + procent_serf
                                         cursor.execute(
                                             'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
                                             currenttime, newvalue, market))
@@ -433,7 +433,7 @@ def tick():
                                                 'update orders set sell = 3 where active=1 and market =("%s")' % market)
                                             cursor.execute(
                                                 'update orders set active = 0 where market =("%s")' % market)
-                                            newvalue = summ_serf() + serf * BTC_price
+                                            newvalue = summ_serf() + procent_serf
                                             cursor.execute(
                                                 'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
                                                 currenttime, newvalue, market))
@@ -480,7 +480,7 @@ def tick():
 
                                             cursor.execute(
                                                 'update orders set sell = 5 where active=1 and market =("%s")' % market)
-                                            newvalue = summ_serf() + serf * BTC_price
+                                            newvalue = summ_serf() + procent_serf
                                             cursor.execute(
                                                 'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
                                                 currenttime, newvalue, market))
@@ -653,7 +653,7 @@ def tick():
                                                      ai_prediction(market)),currtime, market))
                                              cursor.execute(
                                                  'update orders set active = 0 where market =("%s")' % market)
-                                             newvalue = summ_serf() + serf * BTC_price
+                                             newvalue = summ_serf() + procent_serf
                                              cursor.execute(
                                                  'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
                                                  currenttime, newvalue, market))
@@ -698,7 +698,7 @@ def tick():
 
                                             cursor.execute(
                                                 'update orders set active = 0 where market =("%s")' % market)
-                                            newvalue = summ_serf() + serf * BTC_price
+                                            newvalue = summ_serf() + procent_serf
                                             cursor.execute(
                                                 'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
                                                 currenttime, newvalue, market))
@@ -746,7 +746,7 @@ def tick():
 
                                             cursor.execute(
                                                 'update orders set active = 0 where market =("%s")' % market)
-                                            newvalue = summ_serf() + serf * BTC_price
+                                            newvalue = summ_serf() + procent_serf
                                             cursor.execute(
                                                 'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
                                                 currenttime, newvalue, market))
@@ -782,7 +782,7 @@ def tick():
                                             ai_prediction(market)),currtime, market))
                                                 cursor.execute(
                                                     'update orders set active = 0 where market =("%s")' % market)
-                                                newvalue = summ_serf() + serf * BTC_price
+                                                newvalue = summ_serf() + procent_serf
                                                 cursor.execute(
                                                     'insert into statistics(date, serf, market) values("%s", "%s", "%s")' % (
                                                     currenttime, newvalue, market))
