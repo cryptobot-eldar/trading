@@ -624,7 +624,7 @@ def tick():
     #                                         db.close()
                                     #Mail("egaraev@gmail.com", "egaraev@gmail.com", "New sell", printed,"database-service")
 
-                                elif ((newbid * (1 + profit / 3) < (bought_price_sql )) or procent_serf==min_percent_sql) and (sell_signal != 0): # #WAS profit2
+                                elif ((newbid * (1 + profit / 2) < (bought_price_sql )) or procent_serf==min_percent_sql) and (sell_signal != 0): # #WAS profit2
 
                                          print ('   16  -Trying to Sell ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(newbid)) + '  and lose  ' + str(format_float(serf * BTC_price)) + ' USD')
                                     # print ('Selling ' + str(format_float(sell_quantity_sql)) + ' units of ' + market + ' for ' + str(format_float(ask)) + '  and losing  ' + str(format_float(ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql)) + ' BTC' ' or ' + str(format_float((ask * bought_quantity_sql - bought_price_sql * bought_quantity_sql) * BTC_price)) + ' USD')
@@ -1480,7 +1480,7 @@ def tick():
                                         #########!!!!!!!!! SELLING MECHANIZM, DANGER !!!!###################################
                                         #                                        break
 
-                                if serf_usd < 0 and max_percent_sql <= 0.5 and procent_serf == min_percent_sql and timestamp - timestamp_old > 7200:
+                                if serf_usd < 0 and max_percent_sql <= 0.5 and procent_serf == min_percent_sql and timestamp - timestamp_old > 7200 and (thirtymin=="D" or fivemin=="D"):
                                     # if we have already opened order to sell
                                     if has_open_order(market, 'LIMIT_SELL'):
                                         # print('Order already opened to sell  ' + market)
